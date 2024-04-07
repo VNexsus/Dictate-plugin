@@ -1,0 +1,158 @@
+<!--
+ (c) Copyright VNexus 2024
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>OptiReader</title>
+	<script type="text/javascript" src="resources/js/plugins.js"></script>
+    <script type="text/javascript" src="resources/js/plugins-ui.js"></script>
+	<script type="text/javascript" src="vendor/jquery/jquery-3.7.1.min.js"></script>
+	<script type="application/javascript" src="vendor/vosk/0.0.8/vosk.js"></script>
+	<script type="text/javascript" src="scripts/code.js"></script>
+    <link rel="stylesheet" href="resources/css/plugins.css">
+    <link rel="stylesheet" href="resources/css/app.css">
+	<style>
+		html, body {
+			min-height: 100% !important;
+			height: 100%;
+			overflow-y:hidden;
+            overflow-x: hidden;
+			padding: 0;
+			background-color: var(--background-normal)!important;
+		}
+		
+		.pids-container{
+			width: 100%;
+			/*display: table-row;*/
+			display: none;
+		}
+		
+		.pid{
+			width: calc(10% - 2px);
+			height: 10px;
+			display: inline-block;
+			margin: 1px;
+			background-color: var(--border-regular-control);
+		}
+
+		.pid.active {
+			background-color: #69ce2b;
+		}
+
+		.mic-container {
+			text-align: center;
+			display: table-cell;
+			width: 100%;
+			height: 100%;
+			vertical-align: middle;
+		}
+		
+		#mic-control {
+			stroke: rgba(0,0,0,0.5);
+			stroke-width: 0.2px;
+			cursor: pointer;
+			fill: var(--border-regular-control);
+		}
+
+		#mic-control.active {
+			fill: var(--border-error);
+		}
+		
+		#mic-control.loading {
+			fill: var(--background-normal);
+			animation: colorChange 1.5s infinite;
+			cursor: no-drop;
+		}
+
+		#mic-control .mask-color {
+			display: none;
+		}
+		
+		#mic-control.active .mask-color {
+			display: initial;
+		}
+		
+		#volume-rect {
+			transition: height .05s ease-in-out;
+		}
+
+		.container {
+			display: table;
+			height: 100%;
+			width: 100%;
+		}
+		
+		#message-container {
+			display: table;
+			width: 100%;
+			position: absolute;
+			left: 0;
+			height: 100%;
+			top: 0;
+			padding: 5px;
+			pointer-events: none;
+		}
+		
+		#message-container > span {
+			display: table-cell;
+			vertical-align: bottom;
+			text-align: center;
+			animation: intro 3s 1;
+			opacity: 0;
+		}
+
+		
+		@keyframes colorChange {
+			0%{fill: var(--background-normal); stroke: var(--background-normal)}
+			50%{fill: var(--background-normal); stroke: var(--border-regular-control)}
+			100%{fill: var(--background-normal); stroke: var(--background-normal)}
+		}
+		
+		@keyframes intro {
+			0% {
+				opacity: 0;
+			}
+			75% {
+				opacity: 1;
+			}
+			100% {
+				opacity: 0
+			}
+		}
+				
+	</style>
+</head>
+<body style="width: 100%;height: 100%; padding: 5px;">
+	<div class="container">
+		<div class="mic-container">
+			<svg id="mic-control" class="loading" viewBox="0 0 56 56" width="120px" height="120px">
+			  <defs>
+				<path id="mic" xmlns="http://www.w3.org/2000/svg" d="M 27.9999 51.9063 C 41.0546 51.9063 51.9063 41.0781 51.9063 28 C 51.9063 14.9453 41.0312 4.0937 27.9765 4.0937 C 14.8983 4.0937 4.0937 14.9453 4.0937 28 C 4.0937 41.0781 14.9218 51.9063 27.9999 51.9063 Z M 27.9999 31.4922 C 25.5858 31.4922 23.9218 29.6406 23.9218 27.1563 L 23.9218 17.5 C 23.9218 15.0390 25.5858 13.1641 27.9999 13.1641 C 30.4140 13.1641 32.0780 15.0390 32.0780 17.5 L 32.0780 27.1563 C 32.0780 29.6406 30.4140 31.4922 27.9999 31.4922 Z M 21.7655 41.2656 C 21.1796 41.2656 20.6405 40.7500 20.6405 40.1875 C 20.6405 39.5781 21.1796 39.0859 21.7655 39.0859 L 26.9218 39.0859 L 26.9218 36.2031 C 22.0234 35.7344 18.7655 32.0781 18.7655 27.1328 L 18.7655 23.9688 C 18.7655 23.3828 19.2577 22.9141 19.7968 22.9141 C 20.3827 22.9141 20.8983 23.3828 20.8983 23.9688 L 20.8983 27.1328 C 20.8983 31.2578 23.7577 34.2109 27.9999 34.2109 C 32.2187 34.2109 35.1014 31.2578 35.1014 27.1328 L 35.1014 23.9688 C 35.1014 23.3828 35.6171 22.9141 36.2030 22.9141 C 36.7655 22.9141 37.2343 23.3828 37.2343 23.9688 L 37.2343 27.1328 C 37.2343 32.0547 33.9530 35.7109 29.0780 36.2031 L 29.0780 39.0859 L 34.2577 39.0859 C 34.8202 39.0859 35.3358 39.5781 35.3358 40.1875 C 35.3358 40.7500 34.8202 41.2656 34.2577 41.2656 Z"/>
+			  </defs>
+			  <mask id="volume">
+				<rect id="volume-rect" fill="white" width="100%" height="100%"/>
+			  </mask>
+			  <use class="mask-color" xlink:href="#mic" fill="#69ce2b"/>
+			  <use xlink:href="#mic" mask="url(#volume)"/>
+			</svg>
+		</div>
+		<div id="message-container">
+			<span>Загрузка...</span>
+		</div>
+	</div>
+</body>
+</html>

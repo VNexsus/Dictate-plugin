@@ -1,6 +1,6 @@
 ## Плагин для распознавания речи и вставки текста в документы для Р7-Офис
 
-<img alt="Preview" width="213px" src="https://github.com/VNexsus/Dictate-plugin/blob/main/preview.png">
+<img alt="Preview" width="150px" src="https://github.com/VNexsus/Dictate-plugin/blob/main/preview.png">
 
 ## Функциональные возможности:
 Распознавание речи в реальном режиме времени и вставка текста в документ, соединение с интернет не требуется.
